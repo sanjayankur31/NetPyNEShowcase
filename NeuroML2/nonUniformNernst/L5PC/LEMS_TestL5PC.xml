@@ -36,7 +36,7 @@
 
         <!--Note: this could be: Simulation id="sim1" ... , but Component type="Simulation" ... 
         is used to allow validation of this file according to the LEMS schema specified above...-->
-    <Component type="Simulation" id="sim1" length="3000.0ms" step="0.01ms" target="network_L5bPyrCellHayEtAl2011">
+    <Component type="Simulation" id="sim1" length="2000.0ms" step="0.0025ms" target="network_L5bPyrCellHayEtAl2011" seed="1234">
         
         <Display id="CellGroup_1_v" title="L5bPyrCellHayEtAl2011: Default Simulation Configuration, CellGroup_1, VOLTAGE, VOLTAGE, VOLTAGE" xmin="-0.3" xmax="3.3000002" ymin="-0.09200001" ymax="0.052" timeScale="1s">
             <Line id="VOLTAGE" timeScale="1s" quantity="CellGroup_1/0/L5PC/0/v" scale="1 V" color="#000000"/>
