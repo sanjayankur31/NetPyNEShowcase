@@ -5,6 +5,8 @@ Components:
     null (Type: notes)
     Ca_LVAst (Type: ionChannelHH:  conductance=1.0E-11 (SI conductance))
     null (Type: notes)
+    Ih (Type: ionChannelHH:  conductance=1.0E-11 (SI conductance))
+    null (Type: notes)
     K_Pst (Type: ionChannelHH:  conductance=1.0E-11 (SI conductance))
     null (Type: notes)
     K_Tst (Type: ionChannelHH:  conductance=1.0E-11 (SI conductance))
@@ -88,14 +90,14 @@ class NetPyNESimulation():
         # Column: soma_v: Pop: ball_stick_pop; cell: 0; segment id: 0; segment name: Seg0_soma0; Neuron loc: soma0(0.5); value: v (v)
         self.simConfig.recordTraces['output0_ball_stick_pop_0_Seg0_soma0_v'] = {'sec':'soma0','loc':0.5,'var':'v','conds':{'pop':'ball_stick_pop','cellLabel':0}}
                                 
-        # Column: dend_v1: Pop: ball_stick_pop; cell: 0; segment id: 1; segment name: Seg0_dend0; Neuron loc: dend0(0.108452566); value: v (v)
-        self.simConfig.recordTraces['output0_ball_stick_pop_0_Seg0_dend0_v'] = {'sec':'dend0','loc':0.108452566,'var':'v','conds':{'pop':'ball_stick_pop','cellLabel':0}}
+        # Column: dend_v1: Pop: ball_stick_pop; cell: 0; segment id: 1; segment name: Seg0_dend0; Neuron loc: dend0(0.17824325); value: v (v)
+        self.simConfig.recordTraces['output0_ball_stick_pop_0_Seg0_dend0_v'] = {'sec':'dend0','loc':0.17824325,'var':'v','conds':{'pop':'ball_stick_pop','cellLabel':0}}
                                 
-        # Column: dend_v2: Pop: ball_stick_pop; cell: 0; segment id: 2; segment name: Seg1_dend0; Neuron loc: dend0(0.41267884); value: v (v)
-        self.simConfig.recordTraces['output0_ball_stick_pop_0_Seg1_dend0_v'] = {'sec':'dend0','loc':0.41267884,'var':'v','conds':{'pop':'ball_stick_pop','cellLabel':0}}
+        # Column: dend_v2: Pop: ball_stick_pop; cell: 0; segment id: 2; segment name: Seg1_dend0; Neuron loc: dend0(0.51736486); value: v (v)
+        self.simConfig.recordTraces['output0_ball_stick_pop_0_Seg1_dend0_v'] = {'sec':'dend0','loc':0.51736486,'var':'v','conds':{'pop':'ball_stick_pop','cellLabel':0}}
                                 
-        # Column: dend_v3: Pop: ball_stick_pop; cell: 0; segment id: 3; segment name: Seg2_dend0; Neuron loc: dend0(0.8042263); value: v (v)
-        self.simConfig.recordTraces['output0_ball_stick_pop_0_Seg2_dend0_v'] = {'sec':'dend0','loc':0.8042263,'var':'v','conds':{'pop':'ball_stick_pop','cellLabel':0}}
+        # Column: dend_v3: Pop: ball_stick_pop; cell: 0; segment id: 3; segment name: Seg2_dend0; Neuron loc: dend0(0.83912164); value: v (v)
+        self.simConfig.recordTraces['output0_ball_stick_pop_0_Seg2_dend0_v'] = {'sec':'dend0','loc':0.83912164,'var':'v','conds':{'pop':'ball_stick_pop','cellLabel':0}}
                         
         
         self.simConfig.plotCells = ['all']

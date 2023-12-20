@@ -1,4 +1,5 @@
 <neuroml xmlns="http://www.neuroml.org/schema/neuroml2"  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2.3.xsd" id="ball_and_stick">
+    <include href="./Ih.channel.nml"/>
     <include href="./K_Pst.channel.nml"/>
     <include href="./K_Tst.channel.nml"/>
     <include href="./Nap_Et2.channel.nml"/>
@@ -15,18 +16,18 @@
             </segment>
             <segment id="1" name="Seg0_dend0">
                 <parent segment="0"/>
-                <proximal x="8.920620580763856" y="0.0" z="0.0" diameter="10.0"/>
-                <distal x="20.0" y="0.0" z="0.0" diameter="5.0"/>
+                <proximal x="8.920620580763856" y="0.0" z="0.0" diameter="8.920620580763856"/>
+                <distal x="20.0" y="0.0" z="0.0" diameter="7.136496464611085"/>
             </segment>
             <segment id="2" name="Seg1_dend0">
                 <parent segment="1"/>
-                <proximal x="20.0" y="0.0" z="0.0" diameter="5.0"/>
-                <distal x="40.0" y="0.0" z="0.0" diameter="5.0"/>
+                <proximal x="20.0" y="0.0" z="0.0" diameter="7.136496464611085"/>
+                <distal x="30.0" y="0.0" z="0.0" diameter="4.460310290381928"/>
             </segment>
             <segment id="3" name="Seg2_dend0">
                 <parent segment="2"/>
-                <proximal x="40.0" y="0.0" z="0.0" diameter="5.0"/>
-                <distal x="60.0" y="0.0" z="0.0" diameter="5.0"/>
+                <proximal x="30.0" y="0.0" z="0.0" diameter="4.460310290381928"/>
+                <distal x="40.0" y="0.0" z="0.0" diameter="3.5682482323055424"/>
             </segment>
             <segmentGroup id="soma0" neuroLexId="sao864921383">
                 <member segment="0"/>
@@ -55,6 +56,7 @@
         </morphology>
         <biophysicalProperties id="biophys">
             <membraneProperties>
+                <channelDensity id="Ih_all" ionChannel="Ih" condDensity="0.2 mS_per_cm2" erev="-45.0 mV" ion="hcn"/>
                 <channelDensity id="K_Pst_soma" ionChannel="K_Pst" condDensity="2.23 mS_per_cm2" erev="-85.0 mV" segmentGroup="soma_group" ion="k"/>
                 <channelDensity id="K_Tst_soma" ionChannel="K_Tst" condDensity="81.2 mS_per_cm2" erev="-85.0 mV" segmentGroup="soma_group" ion="k"/>
                 <channelDensity id="Nap_Et2_soma" ionChannel="Nap_Et2" condDensity="1.72 mS_per_cm2" erev="50.0 mV" segmentGroup="soma_group" ion="na"/>
@@ -65,7 +67,7 @@
                 <channelDensity id="pas_dend" ionChannel="pas" condDensity="0.0467 mS_per_cm2" erev="-90.0 mV" segmentGroup="dendrite_group" ion="non_specific"/>
                 <channelDensityNonUniformNernst id="Ca_LVAst_dend" ionChannel="Ca_LVAst" ion="ca">
                     <variableParameter parameter="condDensity" segmentGroup="dendrite_group">
-                        <inhomogeneousValue inhomogeneousParameter="PathLengthOverDend" value="1.0E9 * 1.0E-8 * (0.187 + (18.513 * p))"/>
+                        <inhomogeneousValue inhomogeneousParameter="PathLengthOverDend" value="(1.0E-1 * p)"/>
                     </variableParameter>
                 </channelDensityNonUniformNernst>
                 <spikeThresh value="0 mV"/>

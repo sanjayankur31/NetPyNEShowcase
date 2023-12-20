@@ -57,7 +57,12 @@ def create():
     )
     acell.morphinfo(True)
     dend0 = acell.add_unbranched_segments(
-        [(radius, 0, 0, 10), (20, 0, 0, 5), (40, 0, 0, 5), (60, 0, 0, 5)],
+        [
+            (radius, 0, 0, radius * 1.0),
+            (20, 0, 0, radius * 0.8),
+            (30, 0, 0, radius * 0.5),
+            (40, 0, 0, radius * 0.4),
+        ],
         seg_type="dendrite",
         group_id="dend0",
         parent=acell.get_segment(0),
@@ -83,8 +88,6 @@ def create():
     acell.set_specific_capacitance("2.0 uF_per_cm2", group_id="dendrite_group")
     acell.set_init_memb_potential("-80 mV")
 
-    """
-
     acell.add_channel_density(
         doc,
         "Ih_all",
@@ -94,7 +97,6 @@ def create():
         ion="hcn",
         ion_chan_def_file="./Ih.channel.nml",
     )
-    """
     acell.add_channel_density(
         doc,
         "K_Pst_soma",
@@ -195,7 +197,7 @@ def create():
     var_parm.add(
         neuroml.InhomogeneousValue,
         inhomogeneous_parameters="PathLengthOverDend",
-        value="1.0E9 * 1.0E-8 * (0.187 + (18.513 * p))",
+        value="(1.0E-1 * p)",
     )
 
     acell.biophysinfo()

@@ -16,6 +16,7 @@
 
     <Include file="Ca_LVAst.channel.nml"/>
     <Include file="ballandstick.net.nml"/>
+    <Include file="./Ih.channel.nml"/>
     <Include file="./K_Pst.channel.nml"/>
     <Include file="./K_Tst.channel.nml"/>
     <Include file="./Nap_Et2.channel.nml"/>
