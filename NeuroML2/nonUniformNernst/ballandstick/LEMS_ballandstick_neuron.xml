@@ -2,7 +2,7 @@
 
     <!-- 
 
-        This LEMS file has been automatically generated using PyNeuroML v1.1.11 (libNeuroML v0.5.8)
+        This LEMS file has been automatically generated using PyNeuroML v1.1.12 (libNeuroML v0.5.8)
 
      -->
 
@@ -14,8 +14,8 @@
     <Include file="Networks.xml"/>
     <Include file="Simulation.xml"/>
 
+    <Include file="Ca_LVAst.channel.nml"/>
     <Include file="ballandstick.net.nml"/>
-    <Include file="./Ih.channel.nml"/>
     <Include file="./K_Pst.channel.nml"/>
     <Include file="./K_Tst.channel.nml"/>
     <Include file="./Nap_Et2.channel.nml"/>
@@ -27,7 +27,9 @@
     <Simulation id="ballandstick_neuron" length="1000ms" step="0.025ms" target="ball_stick_net" seed="12345">  <!-- Note seed: ensures same random numbers used every run -->
         <OutputFile id="output0" fileName="v.neuron.dat">
             <OutputColumn id="soma_v" quantity="ball_stick_pop/0/acell/0/v"/>
-            <OutputColumn id="dend_v" quantity="ball_stick_pop/0/acell/1/v"/>
+            <OutputColumn id="dend_v1" quantity="ball_stick_pop/0/acell/1/v"/>
+            <OutputColumn id="dend_v2" quantity="ball_stick_pop/0/acell/2/v"/>
+            <OutputColumn id="dend_v3" quantity="ball_stick_pop/0/acell/3/v"/>
         </OutputFile>
 
     </Simulation>

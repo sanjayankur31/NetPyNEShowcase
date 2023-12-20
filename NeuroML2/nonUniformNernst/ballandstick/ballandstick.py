@@ -19,15 +19,16 @@ import numpy
 from neuroml.utils import component_factory
 from pyneuroml.lems import LEMSSimulation
 from pyneuroml.plot import generate_plot
-from pyneuroml.pynml import (run_lems_with_jneuroml_netpyne,
-                             run_lems_with_jneuroml_neuron,
-                             write_neuroml2_file)
+from pyneuroml.pynml import (
+    run_lems_with,
+    write_neuroml2_file,
+)
 
 
 def clean(data=False):
     """Clean up"""
     # clean up
-    shutil.rmtree("x86_64")
+    shutil.rmtree("x86_64", ignore_errors=True)
     for f in glob.glob("*.mod"):
         os.remove(f)
     for f in glob.glob("*.hoc"):
@@ -82,6 +83,8 @@ def create():
     acell.set_specific_capacitance("2.0 uF_per_cm2", group_id="dendrite_group")
     acell.set_init_memb_potential("-80 mV")
 
+    """
+
     acell.add_channel_density(
         doc,
         "Ih_all",
@@ -91,6 +94,7 @@ def create():
         ion="hcn",
         ion_chan_def_file="./Ih.channel.nml",
     )
+    """
     acell.add_channel_density(
         doc,
         "K_Pst_soma",
@@ -178,7 +182,7 @@ def create():
         doc,
         ion_chan_def_file="Ca_LVAst.channel.nml",
         id="Ca_LVAst_dend",
-        ion="Ca",
+        ion="ca",
         ion_channel="Ca_LVAst",
         validate=False,
     )
@@ -191,7 +195,7 @@ def create():
     var_parm.add(
         neuroml.InhomogeneousValue,
         inhomogeneous_parameters="PathLengthOverDend",
-        value="1.0E9 * 1.0E-8 * (0.187 + (18.513 * (H(p - 685) * H(885 - p))))",
+        value="1.0E9 * 1.0E-8 * (0.187 + (18.513 * p))",
     )
 
     acell.biophysinfo()
@@ -232,60 +236,47 @@ def create():
     doc.validate(True)
     write_neuroml2_file(doc, "ballandstick.net.nml")
 
-    # neuron sim
-    newsim = LEMSSimulation(
-        "ballandstick_neuron", duration=1000, dt=0.025, target=network.id
-    )
-    newsim.include_lems_file("Ca_LVAst.channel.nml")
-    newsim.include_neuroml2_file("ballandstick.net.nml")
-    newsim.create_output_file("output0", "v.neuron.dat")
-    newsim.add_column_to_output_file("output0", "soma_v", "ball_stick_pop/0/acell/0/v")
-    newsim.add_column_to_output_file("output0", "dend_v", "ball_stick_pop/0/acell/1/v")
-    simfile = newsim.save_to_file()
-    run_lems_with_jneuroml_neuron(simfile, nogui=True)
-    data_neuron = numpy.loadtxt("v.neuron.dat")
+    data = {}
+    # sims for neuron and netpyne engines
+    for eng in ["neuron", "netpyne"]:
+        # neuron sim
+        newsim = LEMSSimulation(
+            f"ballandstick_{eng}", duration=1000, dt=0.025, target=network.id
+        )
+        newsim.include_lems_file("Ca_LVAst.channel.nml")
+        newsim.include_neuroml2_file("ballandstick.net.nml")
+        newsim.create_output_file("output0", f"v.{eng}.dat")
+        newsim.add_column_to_output_file(
+            "output0", "soma_v", "ball_stick_pop/0/acell/0/v"
+        )
+        newsim.add_column_to_output_file(
+            "output0", "dend_v1", "ball_stick_pop/0/acell/1/v"
+        )
+        newsim.add_column_to_output_file(
+            "output0", "dend_v2", "ball_stick_pop/0/acell/2/v"
+        )
+        newsim.add_column_to_output_file(
+            "output0", "dend_v3", "ball_stick_pop/0/acell/3/v"
+        )
+        simfile = newsim.save_to_file()
+        run_lems_with(f"jneuroml_{eng}", simfile, nogui=True)
+        data[eng] = numpy.loadtxt(f"v.{eng}.dat")
+        clean()
 
-    # clean up
-    shutil.rmtree("x86_64")
-    for f in glob.glob("*.mod"):
-        os.remove(f)
-    for f in glob.glob("*.hoc"):
-        os.remove(f)
-
-    # netpyne
-    newsim = LEMSSimulation(
-        "ballandstick_netpyne", duration=1000, dt=0.025, target=network.id
-    )
-    newsim.include_lems_file("Ca_LVAst.channel.nml")
-    newsim.include_neuroml2_file("ballandstick.net.nml")
-    newsim.create_output_file("output0", "v.netpyne.dat")
-    newsim.add_column_to_output_file("output0", "soma_v", "ball_stick_pop/0/acell/0/v")
-    newsim.add_column_to_output_file("output0", "dend_v", "ball_stick_pop/0/acell/1/v")
-    simfile = newsim.save_to_file()
-
-    run_lems_with_jneuroml_netpyne(simfile, nogui=True)
-    data_netpyne = numpy.loadtxt("v.netpyne.dat")
-
-    generate_plot(
-        [data_neuron[:, 0], data_netpyne[:, 0]],
-        [data_neuron[:, 1], data_netpyne[:, 1]],
-        title="Memb pot soma",
-        labels=["nrn", "netpyne"],
-        xaxis="time (s)",
-        yaxis="v (mV)",
-    )
-
-    generate_plot(
-        [data_neuron[:, 0], data_netpyne[:, 0]],
-        [data_neuron[:, 2], data_netpyne[:, 2]],
-        title="Memb pot dend",
-        labels=["nrn", "netpyne"],
-        xaxis="time (s)",
-        yaxis="v (mV)",
-    )
+    data_neuron = data["neuron"]
+    data_netpyne = data["netpyne"]
+    for x in range(0, 4):
+        generate_plot(
+            [data_neuron[:, 0], data_netpyne[:, 0]],
+            [data_neuron[:, x + 1], data_netpyne[:, x + 1]],
+            title=f"Memb pot seg {x}",
+            labels=["nrn", "netpyne"],
+            xaxis="time (s)",
+            yaxis="v (mV)",
+        )
 
 
 if __name__ == "__main__":
     clean()
     create()
-    clean()
+    # clean()
