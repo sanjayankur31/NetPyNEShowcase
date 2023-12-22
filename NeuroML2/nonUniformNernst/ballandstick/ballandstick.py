@@ -240,7 +240,9 @@ def create():
 
     data = {}
     # sims for neuron and netpyne engines
-    for eng in ["neuron", "netpyne"]:
+    # engines = ["netpyne"]
+    engines = ["neuron", "netpyne"]
+    for eng in engines:
         # neuron sim
         newsim = LEMSSimulation(
             f"ballandstick_{eng}", duration=1000, dt=0.025, target=network.id
@@ -263,16 +265,18 @@ def create():
         simfile = newsim.save_to_file()
         run_lems_with(f"jneuroml_{eng}", simfile, nogui=True)
         data[eng] = numpy.loadtxt(f"v.{eng}.dat")
-        clean()
 
-    data_neuron = data["neuron"]
-    data_netpyne = data["netpyne"]
     for x in range(0, 4):
+        xs = []
+        ys = []
+        for eng in engines:
+            xs.append(data[eng][:, 0])
+            ys.append(data[eng][:, x + 1])
         generate_plot(
-            [data_neuron[:, 0], data_netpyne[:, 0]],
-            [data_neuron[:, x + 1], data_netpyne[:, x + 1]],
+            xs,
+            ys,
             title=f"Memb pot seg {x}",
-            labels=["nrn", "netpyne"],
+            labels=engines,
             xaxis="time (s)",
             yaxis="v (mV)",
         )
@@ -281,4 +285,3 @@ def create():
 if __name__ == "__main__":
     clean()
     create()
-    # clean()
