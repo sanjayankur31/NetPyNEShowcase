@@ -19,6 +19,8 @@ import numpy
 from neuroml.utils import component_factory
 from pyneuroml.lems import LEMSSimulation
 from pyneuroml.plot import generate_plot
+from pyneuroml.plot.PlotMorphologyVispy import (plot_3D_cell_morphology,
+                                                plot_interactive_3D)
 from pyneuroml.pynml import (
     run_lems_with,
     write_neuroml2_file,
@@ -201,6 +203,21 @@ def create():
     )
 
     acell.biophysinfo()
+
+    # highlight_spec = {
+    #     "1": {"marker_size": ["10", "10"], "marker_type": "cylinder",
+    #           "marker_color": "yellow"},
+    #     "3": {"marker_size": ["10", "10"], "marker_type": "cylinder",
+    #           "marker_color": "orange"}
+    #     }
+
+    # plot_3D_cell_morphology(cell=acell,
+    #                         nogui=False,
+    #                         highlight_spec=highlight_spec, plot_type="detailed")
+    #
+    # plot_interactive_3D(nml_file=acell,
+    #                     nogui=False,
+    #                     highlight_spec={"acell": highlight_spec}, plot_type="detailed")
     doc.add(acell)
 
     # network
