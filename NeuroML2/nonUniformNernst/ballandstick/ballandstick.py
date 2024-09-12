@@ -13,6 +13,8 @@ import glob
 import math
 import os
 import shutil
+import itertools
+import statistics
 
 import neuroml
 import numpy
@@ -57,7 +59,6 @@ def create():
         seg_type="soma",
         group_id="soma0",
     )
-    acell.morphinfo(True)
     dend0 = acell.add_unbranched_segments(
         [
             (radius, 0, 0, radius * 1.0),
@@ -80,7 +81,6 @@ def create():
         validate=False,
     )
     inhom.add(neuroml.ProximalDetails, translation_start="0")
-
     acell.morphinfo(True)
 
     # biophysics
@@ -90,6 +90,7 @@ def create():
     acell.set_specific_capacitance("2.0 uF_per_cm2", group_id="dendrite_group")
     acell.set_init_memb_potential("-80 mV")
 
+    """
     acell.add_channel_density(
         doc,
         "Ih_all",
@@ -159,6 +160,8 @@ def create():
         ion_chan_def_file="./SK_E2.channel.nml",
         group_id="soma_group",
     )
+
+    """
     acell.add_channel_density(
         doc,
         "pas_soma",
@@ -188,7 +191,6 @@ def create():
         id="Ca_LVAst_dend",
         ion="ca",
         ion_channel="Ca_LVAst",
-        validate=False,
     )
     var_parm = ca_lva.add(
         neuroml.VariableParameter,
@@ -297,6 +299,14 @@ def create():
             xaxis="time (s)",
             yaxis="v (mV)",
         )
+        engine_combinations = itertools.combinations(engines, 2)
+        for e1, e2 in engine_combinations:
+            data1 = data[e1][:, x + 1]
+            data2 = data[e2][:, x + 1]
+            diff = [v1 - v2 for v1, v2 in zip(data1, data2)]
+            datalen = len(diff)
+            print(f"Stats (diff): mean: {statistics.mean(diff)}, stdev: {statistics.pstdev(diff)}")
+            print(f"Correlation: {statistics.correlation(data1[:datalen], data2[:datalen])}")
 
 
 if __name__ == "__main__":
