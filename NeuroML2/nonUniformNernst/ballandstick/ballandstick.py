@@ -23,6 +23,7 @@ from pyneuroml.lems import LEMSSimulation
 from pyneuroml.plot import generate_plot
 from pyneuroml.plot.PlotMorphologyVispy import (plot_3D_cell_morphology,
                                                 plot_interactive_3D)
+from pyneuroml.utils.components import add_new_component
 from pyneuroml.pynml import (
     run_lems_with,
     write_neuroml2_file,
@@ -65,6 +66,10 @@ def create():
             (20, 0, 0, radius * 0.8),
             (30, 0, 0, radius * 0.5),
             (40, 0, 0, radius * 0.4),
+            (50, 0, 0, radius * 0.4),
+            (60, 0, 0, radius * 0.4),
+            (70, 0, 0, radius * 0.4),
+            (80, 0, 0, radius * 0.4),
         ],
         seg_type="dendrite",
         group_id="dend0",
@@ -90,78 +95,20 @@ def create():
     acell.set_specific_capacitance("2.0 uF_per_cm2", group_id="dendrite_group")
     acell.set_init_memb_potential("-80 mV")
 
-    """
-    acell.add_channel_density(
-        doc,
-        "Ih_all",
-        "Ih",
-        "0.2 mS_per_cm2",
-        "-45.0 mV",
-        ion="hcn",
-        ion_chan_def_file="./Ih.channel.nml",
-    )
-    acell.add_channel_density(
-        doc,
-        "K_Pst_soma",
-        "K_Pst",
-        "2.23 mS_per_cm2",
-        "-85.0 mV",
-        ion="k",
-        ion_chan_def_file="./K_Pst.channel.nml",
-        group_id="soma_group",
-    )
-    acell.add_channel_density(
-        doc,
-        "K_Tst_soma",
-        "K_Tst",
-        "81.2 mS_per_cm2",
-        "-85.0 mV",
-        ion="k",
-        ion_chan_def_file="./K_Tst.channel.nml",
-        group_id="soma_group",
-    )
-    acell.add_channel_density(
-        doc,
-        "Nap_Et2_soma",
-        "Nap_Et2",
-        "1.72 mS_per_cm2",
-        "50.0 mV",
-        ion="na",
-        ion_chan_def_file="./Nap_Et2.channel.nml",
-        group_id="soma_group",
-    )
-    acell.add_channel_density(
-        doc,
-        "NaTa_t_soma",
-        "NaTa_t",
-        "2040 mS_per_cm2",
-        "50.0 mV",
-        ion="na",
-        ion_chan_def_file="./NaTa_t.channel.nml",
-        group_id="soma_group",
-    )
-    acell.add_channel_density(
-        doc,
-        "SKv3_1_soma",
-        "SKv3_1",
-        "693.0 mS_per_cm2",
-        "-85.0 mV",
-        ion="k",
-        ion_chan_def_file="./SKv3_1.channel.nml",
-        group_id="soma_group",
-    )
-    acell.add_channel_density(
-        doc,
-        "SK_E2_soma",
-        "SK_E2",
-        "44.0 mS_per_cm2",
-        "-85.0 mV",
-        ion="k",
-        ion_chan_def_file="./SK_E2.channel.nml",
-        group_id="soma_group",
+    acell.add_intracellular_property(
+        "Species", id="ca", ion="ca", concentration_model="CaClamp",
+        initial_concentration="5E-5 mM",
+        initial_ext_concentration="2.0 mM"
     )
 
-    """
+    doc.add(neuroml.IncludeType, href="channels/CaClamp.nml")
+    caclamp, caclamp_file = add_new_component(
+        component_id="CaClamp", component_type="caClamp",
+        conc0="5E-5 mM",
+        conc1="5E-5mM", delay="500.0ms", duration="500.0ms",
+        ion="ca"
+    )
+
     acell.add_channel_density(
         doc,
         "pas_soma",
@@ -259,7 +206,6 @@ def create():
 
     data = {}
     # sims for neuron and netpyne engines
-    # engines = ["netpyne"]
     engines = ["neuron", "netpyne"]
     for eng in engines:
         # neuron sim
@@ -267,25 +213,23 @@ def create():
             f"ballandstick_{eng}", duration=1000, dt=0.025, target=network.id
         )
         newsim.include_lems_file("Ca_LVAst.channel.nml")
+        newsim.include_lems_file(caclamp_file)
         newsim.include_neuroml2_file("ballandstick.net.nml")
         newsim.create_output_file("output0", f"v.{eng}.dat")
         newsim.add_column_to_output_file(
             "output0", "soma_v", "ball_stick_pop/0/acell/0/v"
         )
-        newsim.add_column_to_output_file(
-            "output0", "dend_v1", "ball_stick_pop/0/acell/1/v"
-        )
-        newsim.add_column_to_output_file(
-            "output0", "dend_v2", "ball_stick_pop/0/acell/2/v"
-        )
-        newsim.add_column_to_output_file(
-            "output0", "dend_v3", "ball_stick_pop/0/acell/3/v"
-        )
+        # record from every dendritic segment
+        for sid in dend0.members:
+            newsim.add_column_to_output_file(
+                "output0", f"dend_v{sid.segments}",
+                f"ball_stick_pop/0/acell/{sid.segments}/v"
+            )
         simfile = newsim.save_to_file()
         run_lems_with(f"jneuroml_{eng}", simfile, nogui=True)
         data[eng] = numpy.loadtxt(f"v.{eng}.dat")
 
-    for x in range(0, 4):
+    for x in range(0, len(dend0.members)):
         xs = []
         ys = []
         for eng in engines:
