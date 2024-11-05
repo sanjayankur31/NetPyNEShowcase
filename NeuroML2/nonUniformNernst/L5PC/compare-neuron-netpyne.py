@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
-Enter one line description here.
+Script to generate a simple NeuroML model and run it in NEURON and NetPyNE to
+compare results.
 
-File:
+This can probably be generalised, but since different cells may have different
+channels, it's easier to copy this and modify it as required for each cell.
+
+File: compare-neuron-netpyne.py
 
 Copyright 2024 Ankur Sinha
 Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
@@ -18,19 +22,24 @@ from pyneuroml.plot import generate_plot
 import numpy
 
 
-celldoc: neuroml.NeuroMLDocument = read_neuroml2_file("L5PC.cell.nml")
+celldoc: neuroml.NeuroMLDocument = read_neuroml2_file("L5PC.cell.frac.nml")
 acell: neuroml.Cell = celldoc.cells[0]
 
 # remove all other channel densities
 membrane_props = acell.biophysical_properties.membrane_properties
+
 for attr in membrane_props.info(return_format="list"):
     if "channel_densit" in attr:
-        if attr != "channel_density_non_uniform_nernsts":
+        # if attr == "channel_density_non_uniform_nernsts":
+        if "non_uniform" in attr or "nernst" in attr:
             setattr(membrane_props, attr, [])
+        """
+
         # only keep 1
         else:
             non_uniform_nernsts = getattr(membrane_props, attr)
             setattr(membrane_props, attr, [non_uniform_nernsts[0]])
+        """
 
 doc = component_factory(neuroml.NeuroMLDocument, id="L5PC_test")
 doc.add(acell)
@@ -58,7 +67,7 @@ pg = doc.add(
     id="pg0",
     delay="500ms",
     duration="500ms",
-    amplitude="100pA",
+    amplitude="7.93E-10A",
 )
 input_list = network.add(
     neuroml.InputList,
