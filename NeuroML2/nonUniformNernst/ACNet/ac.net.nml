@@ -5,6 +5,7 @@
     <include href="Kdr_pyr.channel.nml"/>
     <include href="LeakConductance_pyr.channel.nml"/>
     <include href="Na_pyr.channel.nml"/>
+    <include href="Ih.channel.nml"/>
     <cell id="pyr_4_sym">
         <notes>A simplified pyramidal cell model with 9 compartments</notes>
         <morphology id="morphology_pyr_4_sym">
@@ -89,9 +90,6 @@
                 <include segmentGroup="basal0"/>
                 <include segmentGroup="basal1"/>
                 <include segmentGroup="basal2"/>
-                <inhomogeneousParameter id="PathOverAllSegs" variable="p" metric="Path Length from root">
-                    <proximal translationStart="0.0"/>
-                </inhomogeneousParameter>
             </segmentGroup>
             <segmentGroup id="soma_group" neuroLexId="GO:0043025">
                 <include segmentGroup="soma"/>
@@ -105,6 +103,9 @@
                 <include segmentGroup="basal0"/>
                 <include segmentGroup="basal1"/>
                 <include segmentGroup="basal2"/>
+                <inhomogeneousParameter id="PathLengthOverAllSegs" variable="p" metric="Path Length from root">
+                    <proximal translationStart="0.0"/>
+                </inhomogeneousParameter>
             </segmentGroup>
             <segmentGroup id="apical_dends">
                 <include segmentGroup="apical0"/>
@@ -135,8 +136,8 @@
             <membraneProperties>
                 <channelDensity id="LeakConductance_pyr_all" ionChannel="LeakConductance_pyr" condDensity="0.1420051 mS_per_cm2" erev="-66.0 mV" ion="non_specific"/>
                 <channelDensityNonUniform id="Ih_all" ionChannel="Ih" erev="-45mV" ion="hcn">
-                    <variableParameter parameter="condDensity" segmentGroup="all">
-                        <inhomogeneousValue inhomogeneousParameter="PathOverAllSegs" value="0.0"/>
+                    <variableParameter parameter="condDensity" segmentGroup="dendrite_group">
+                        <inhomogeneousValue inhomogeneousParameter="PathLengthOverAllSegs" value="10 * p"/>
                     </variableParameter>
                 </channelDensityNonUniform>
                 <spikeThresh value="0 mV"/>

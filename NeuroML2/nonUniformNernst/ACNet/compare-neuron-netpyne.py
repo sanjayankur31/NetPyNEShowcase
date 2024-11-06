@@ -26,13 +26,19 @@ import numpy
 celldoc: neuroml.NeuroMLDocument = read_neuroml2_file("pyr_4_sym.cell.nml")
 acell: neuroml.Cell = celldoc.cells[0]
 
+doc = component_factory(neuroml.NeuroMLDocument, id="pyr_4_sym_test")
+doc.add(acell)
+doc.includes.extend(celldoc.includes)
+
 # add inhom param
 all_segment_group = acell.get_segment_group("all")
-inhom_param = all_segment_group.add(neuroml.InhomogeneousParameter,
-                                    id="PathOverAllSegs", variable="p",
-                                    metric="Path Length from root")
+dendrite_group = acell.get_segment_group("dendrite_group")
+inhom_param = dendrite_group.add(neuroml.InhomogeneousParameter,
+                                 id="PathLengthOverAllSegs", variable="p",
+                                 metric="Path Length from root",
+                                 validate=False)
 
-inhom_param.add(neuroml.ProximalDetails, translation_start="0")
+inhom_param.add(neuroml.ProximalDetails, translation_start="0.0")
 
 # only keep leak
 membrane_props = acell.biophysical_properties.membrane_properties
@@ -44,18 +50,17 @@ for cd in channel_densities:
     if "Leak" in cd.id:
         newcds.append(cd)
 membrane_props.channel_densities = newcds
-new_non_uniform_cd = membrane_props.add(neuroml.ChannelDensityNonUniform, id="Ih_all",
-                                        ion_channel="Ih", ion="hcn", erev="-45mV", validate=False)
+new_non_uniform_cd = acell.add_channel_density_v("ChannelDensityNonUniform", doc,
+                                                 ion_chan_def_file="Ih.channel.nml", ion="hcn",
+                                                 erev="-45mV",
+                                                 ion_channel="Ih", id="Ih_all")
 
 var_par = new_non_uniform_cd.add(neuroml.VariableParameter, parameter="condDensity",
-                                 segment_groups="all", validate=False)
+                                 segment_groups="dendrite_group", validate=False)
 
 var_par.add(neuroml.InhomogeneousValue,
-            inhomogeneous_parameters="PathOverAllSegs", value="0.0")
+            inhomogeneous_parameters="PathLengthOverAllSegs", value="10 * p")
 
-doc = component_factory(neuroml.NeuroMLDocument, id="pyr_4_sym_test")
-doc.add(acell)
-doc.includes.extend(celldoc.includes)
 
 # network
 network = doc.add(neuroml.Network, id="ac_net", validate=False)
