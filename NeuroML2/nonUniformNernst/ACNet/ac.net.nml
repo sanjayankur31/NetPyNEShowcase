@@ -5,7 +5,7 @@
     <include href="Kdr_pyr.channel.nml"/>
     <include href="LeakConductance_pyr.channel.nml"/>
     <include href="Na_pyr.channel.nml"/>
-    <include href="Ih.channel.nml"/>
+    <include href="LeakConductance_pyr.channel.nml"/>
     <cell id="pyr_4_sym">
         <notes>A simplified pyramidal cell model with 9 compartments</notes>
         <morphology id="morphology_pyr_4_sym">
@@ -134,10 +134,9 @@
         </morphology>
         <biophysicalProperties id="biophys">
             <membraneProperties>
-                <channelDensity id="LeakConductance_pyr_all" ionChannel="LeakConductance_pyr" condDensity="0.1420051 mS_per_cm2" erev="-66.0 mV" ion="non_specific"/>
-                <channelDensityNonUniform id="Ih_all" ionChannel="Ih" erev="-45mV" ion="hcn">
+                <channelDensityNonUniform id="Leak_all" ionChannel="LeakConductance_pyr" erev="-66mV" ion="non_specific">
                     <variableParameter parameter="condDensity" segmentGroup="dendrite_group">
-                        <inhomogeneousValue inhomogeneousParameter="PathLengthOverAllSegs" value="10 * p"/>
+                        <inhomogeneousValue inhomogeneousParameter="PathLengthOverAllSegs" value="0.01 * p"/>
                     </variableParameter>
                 </channelDensityNonUniform>
                 <spikeThresh value="0 mV"/>
@@ -150,7 +149,7 @@
             </intracellularProperties>
         </biophysicalProperties>
     </cell>
-    <pulseGenerator id="pg0" delay="500ms" duration="500ms" amplitude="7.93E-10A"/>
+    <pulseGenerator id="pg0" delay="500ms" duration="500ms" amplitude="1E-8A"/>
     <network id="ac_net">
         <population id="ac_pop" component="pyr_4_sym" size="1" type="populationList">
             <instance id="0">

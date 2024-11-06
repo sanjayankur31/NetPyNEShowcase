@@ -13,7 +13,6 @@ Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
 """
 
 
-import sys
 import neuroml
 from neuroml.utils import component_factory
 from pyneuroml.io import read_neuroml2_file, write_neuroml2_file
@@ -43,23 +42,20 @@ inhom_param.add(neuroml.ProximalDetails, translation_start="0.0")
 # only keep leak
 membrane_props = acell.biophysical_properties.membrane_properties
 
-channel_densities = membrane_props.channel_densities
-newcds = []
-
-for cd in channel_densities:
-    if "Leak" in cd.id:
-        newcds.append(cd)
-membrane_props.channel_densities = newcds
+# clear all channel densities
+membrane_props.channel_densities = []
 new_non_uniform_cd = acell.add_channel_density_v("ChannelDensityNonUniform", doc,
-                                                 ion_chan_def_file="Ih.channel.nml", ion="hcn",
-                                                 erev="-45mV",
-                                                 ion_channel="Ih", id="Ih_all")
+                                                 ion_chan_def_file="LeakConductance_pyr.channel.nml",
+                                                 ion="non_specific",
+                                                 erev="-66mV",
+                                                 ion_channel="LeakConductance_pyr",
+                                                 id="Leak_all")
 
 var_par = new_non_uniform_cd.add(neuroml.VariableParameter, parameter="condDensity",
                                  segment_groups="dendrite_group", validate=False)
 
 var_par.add(neuroml.InhomogeneousValue,
-            inhomogeneous_parameters="PathLengthOverAllSegs", value="10 * p")
+            inhomogeneous_parameters="PathLengthOverAllSegs", value="0.01 * p")
 
 
 # network
@@ -84,7 +80,7 @@ pg = doc.add(
     id="pg0",
     delay="500ms",
     duration="500ms",
-    amplitude="7.93E-10A",
+    amplitude="1E-8A",
 )
 input_list = network.add(
     neuroml.InputList,
@@ -110,7 +106,7 @@ write_neuroml2_file(doc, "ac.net.nml")
 data = {}
 # sims for neuron and netpyne engines
 engines = ["neuron", "netpyne"]
-segs_record = [0, 8, 5, 4]
+segs_record = [0, 8, 4]
 for eng in engines:
     # neuron sim
     newsim = LEMSSimulation(
